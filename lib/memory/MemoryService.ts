@@ -297,6 +297,44 @@ export class MemoryService {
   }
 
   /**
+   * Get all memories for a user
+   *
+   * Retrieves all memories without semantic search, sorted by creation date (newest first).
+   * Useful for viewing complete memory history or exporting all memories.
+   *
+   * @param userId User ID to retrieve memories for
+   * @returns Array of all memories for the user, sorted by creation date
+   */
+  async getAll(userId: string): Promise<Memory[]> {
+    try {
+      console.log('Retrieving all memories...');
+      console.log('User ID:', userId);
+
+      // Get all memories from vector store
+      const results = await this.vectorStore.getAllByUserId(userId);
+
+      console.log(`Found ${results.length} memories`);
+
+      // Map to Memory type
+      const memories: Memory[] = results.map(result => ({
+        id: result.id,
+        memory: result.payload.data,
+        user_id: result.payload.user_id,
+        hash: result.payload.hash,
+        created_at: result.payload.created_at,
+        updated_at: result.payload.updated_at,
+        metadata: result.payload.metadata,
+      }));
+
+      return memories;
+
+    } catch (error) {
+      console.error('Memory getAll error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Close all connections
    */
   async close(): Promise<void> {
