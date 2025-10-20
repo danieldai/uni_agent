@@ -9,7 +9,7 @@
  * - History tracking
  */
 
-import { Message, MemoryResult } from './types';
+import { Message, MemoryResult, Memory } from './types';
 import { OpenSearchStore } from './stores/OpenSearchStore';
 import { HistoryStore } from './stores/HistoryStore';
 import { OpenAIEmbedding } from './embeddings/OpenAIEmbedding';
@@ -241,6 +241,59 @@ export class MemoryService {
       new_value: null,
       event: 'DELETE',
     });
+  }
+
+  /**
+   * Search for relevant memories
+   *
+   * Process flow:
+   * 1. Generate embedding for query
+   * 2. Search vector store for similar memories
+   * 3. Return results with scores
+   *
+   * @param query Search query text
+   * @param userId User ID to filter results
+   * @returns Array of memories with similarity scores
+   */
+  async search(query: string, userId: string): Promise<Memory[]> {
+    try {
+      console.log('Searching for memories...');
+      console.log('Query:', query);
+
+      // Step 1: Generate embedding for query
+      console.log('Step 1: Generating query embedding...');
+      const queryEmbedding = await this.embedding.embed(query);
+
+      // Step 2: Search vector store
+      console.log('Step 2: Searching vector store...');
+      const results = await this.vectorStore.search(
+        queryEmbedding,
+        { user_id: userId },
+        memoryConfig.behavior.retrievalLimit
+      );
+
+      console.log(`Found ${results.length} memories`);
+
+      // Step 3: Filter by similarity threshold and map to Memory type
+      const memories: Memory[] = results
+        .filter(result => result.score >= memoryConfig.behavior.similarityThreshold)
+        .map(result => ({
+          id: result.id,
+          memory: result.payload.data,
+          user_id: result.payload.user_id,
+          hash: result.payload.hash,
+          created_at: result.payload.created_at,
+          updated_at: result.payload.updated_at,
+          score: result.score,
+        }));
+
+      console.log(`Returning ${memories.length} memories above threshold (${memoryConfig.behavior.similarityThreshold})`);
+      return memories;
+
+    } catch (error) {
+      console.error('Memory search error:', error);
+      throw error;
+    }
   }
 
   /**
