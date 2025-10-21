@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.4.3",
     "@opensearch-project/opensearch": "^3.5.1",
     "better-sqlite3": "^12.4.1",
     "crypto-js": "^4.2.0",
