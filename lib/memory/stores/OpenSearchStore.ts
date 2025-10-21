@@ -134,6 +134,20 @@ export class OpenSearchStore implements VectorStore {
    */
   async update(id: string, vector: number[], payload: any): Promise<void> {
     try {
+      // Check if document exists first
+      const exists = await this.client.exists({
+        index: this.index,
+        id,
+      });
+
+      if (!exists.body) {
+        // Document doesn't exist, use insert instead
+        console.log(`Document ${id} doesn't exist, using insert instead of update`);
+        await this.insert([vector], [id], [payload]);
+        return;
+      }
+
+      // Document exists, perform update
       await this.client.update({
         index: this.index,
         id,
