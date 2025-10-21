@@ -380,6 +380,45 @@ export class MemoryService {
   }
 
   /**
+   * Delete a specific memory
+   *
+   * Removes a memory from the vector store and records the deletion in history.
+   *
+   * @param memoryId Memory ID to delete
+   */
+  async delete(memoryId: string): Promise<void> {
+    try {
+      console.log('Deleting memory...');
+      console.log('Memory ID:', memoryId);
+
+      // Get the memory first to record its content in history
+      const memory = await this.vectorStore.get(memoryId);
+
+      if (!memory) {
+        throw new Error(`Memory not found: ${memoryId}`);
+      }
+
+      // Delete from vector store
+      await this.vectorStore.delete(memoryId);
+
+      // Record in history
+      await this.historyStore.add({
+        memory_id: memoryId,
+        user_id: memory.user_id,
+        prev_value: memory.data,
+        new_value: null,
+        event: 'DELETE',
+      });
+
+      console.log('Memory deleted successfully');
+
+    } catch (error) {
+      console.error('Memory delete error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Close all connections
    */
   async close(): Promise<void> {
