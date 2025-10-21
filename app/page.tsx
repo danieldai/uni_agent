@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Message } from './types/chat';
+import { MemoryViewer } from './components/MemoryViewer';
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -215,6 +216,9 @@ export default function Home() {
           </div>
         </form>
       </div>
+
+      {/* Memory Viewer */}
+      <MemoryViewer userId={userId} />
     </div>
   );
 }
