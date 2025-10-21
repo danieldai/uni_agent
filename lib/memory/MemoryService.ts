@@ -17,6 +17,7 @@ import { FactExtractor } from './extractors/FactExtractor';
 import { ActionDecider } from './extractors/ActionDecider';
 import { generateHash } from './utils/hash';
 import { memoryConfig } from './config';
+import { allocateTokenBudget } from './utils/tokenBudget';
 
 export class MemoryService {
   private vectorStore: OpenSearchStore;
@@ -249,13 +250,22 @@ export class MemoryService {
    * Process flow:
    * 1. Generate embedding for query
    * 2. Search vector store for similar memories
-   * 3. Return results with scores
+   * 3. Filter by similarity threshold
+   * 4. Apply token budget if specified
+   * 5. Return results with scores
    *
    * @param query Search query text
    * @param userId User ID to filter results
+   * @param limit Maximum number of results to return (default: from config)
+   * @param maxTokens Optional maximum token budget for returned memories
    * @returns Array of memories with similarity scores
    */
-  async search(query: string, userId: string): Promise<Memory[]> {
+  async search(
+    query: string,
+    userId: string,
+    limit?: number,
+    maxTokens?: number
+  ): Promise<Memory[]> {
     try {
       console.log('Searching for memories...');
       console.log('Query:', query);
@@ -269,13 +279,13 @@ export class MemoryService {
       const results = await this.vectorStore.search(
         queryEmbedding,
         { user_id: userId },
-        memoryConfig.behavior.retrievalLimit
+        limit || memoryConfig.behavior.retrievalLimit
       );
 
       console.log(`Found ${results.length} memories`);
 
       // Step 3: Filter by similarity threshold and map to Memory type
-      const memories: Memory[] = results
+      let memories: Memory[] = results
         .filter(result => result.score >= memoryConfig.behavior.similarityThreshold)
         .map(result => ({
           id: result.id,
@@ -287,7 +297,15 @@ export class MemoryService {
           score: result.score,
         }));
 
-      console.log(`Returning ${memories.length} memories above threshold (${memoryConfig.behavior.similarityThreshold})`);
+      console.log(`Filtered to ${memories.length} memories above threshold (${memoryConfig.behavior.similarityThreshold})`);
+
+      // Step 4: Apply token budget if specified
+      if (maxTokens !== undefined && maxTokens > 0) {
+        console.log(`Applying token budget: ${maxTokens} tokens`);
+        memories = allocateTokenBudget(maxTokens, 0, memories, 0);
+        console.log(`After token budget: ${memories.length} memories`);
+      }
+
       return memories;
 
     } catch (error) {
