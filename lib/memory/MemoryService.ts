@@ -9,7 +9,7 @@
  * - History tracking
  */
 
-import { Message, MemoryResult, Memory } from './types';
+import { Message, MemoryResult, Memory, HistoryEntry } from './types';
 import { OpenSearchStore } from './stores/OpenSearchStore';
 import { HistoryStore } from './stores/HistoryStore';
 import { OpenAIEmbedding } from './embeddings/OpenAIEmbedding';
@@ -330,6 +330,33 @@ export class MemoryService {
 
     } catch (error) {
       console.error('Memory getAll error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get history for a specific memory
+   *
+   * Retrieves the complete audit trail for a memory, showing all changes
+   * (ADD, UPDATE, DELETE events) that occurred over time.
+   *
+   * @param memoryId Memory ID to retrieve history for
+   * @returns Array of history entries for the memory, ordered by timestamp
+   */
+  async history(memoryId: string): Promise<HistoryEntry[]> {
+    try {
+      console.log('Retrieving memory history...');
+      console.log('Memory ID:', memoryId);
+
+      // Get history from history store
+      const entries = await this.historyStore.getByMemoryId(memoryId);
+
+      console.log(`Found ${entries.length} history entries`);
+
+      return entries;
+
+    } catch (error) {
+      console.error('Memory history error:', error);
       throw error;
     }
   }
