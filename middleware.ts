@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Handle CORS for API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  console.log('[Middleware] Processing:', request.method, request.nextUrl.pathname);
+
+  // Handle CORS for all API routes
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
+
+  if (isApiRoute) {
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
+      console.log('[Middleware] Handling OPTIONS for:', request.nextUrl.pathname);
       return new NextResponse(null, {
-        status: 200,
+        status: 204,
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -23,6 +28,7 @@ export function middleware(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
+    console.log('[Middleware] Added CORS headers to:', request.nextUrl.pathname);
     return response;
   }
 
@@ -30,5 +36,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: ['/api/:path*', '/api/:path*/'],
 };
