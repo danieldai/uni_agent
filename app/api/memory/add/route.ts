@@ -41,14 +41,20 @@ export async function POST(req: NextRequest) {
     if (!messages || !Array.isArray(messages)) {
       return Response.json(
         { error: 'messages array is required in request body' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
     if (!userId) {
       return Response.json(
         { error: 'userId is required in request body' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -57,14 +63,20 @@ export async function POST(req: NextRequest) {
       if (!msg.role || !msg.content) {
         return Response.json(
           { error: 'Each message must have role and content properties' },
-          { status: 400 }
+          {
+            status: 400,
+            headers: corsHeaders,
+          }
         );
       }
 
       if (!['user', 'assistant', 'system'].includes(msg.role)) {
         return Response.json(
           { error: 'Message role must be user, assistant, or system' },
-          { status: 400 }
+          {
+            status: 400,
+            headers: corsHeaders,
+          }
         );
       }
     }

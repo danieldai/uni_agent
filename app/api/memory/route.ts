@@ -37,7 +37,10 @@ export async function GET(req: NextRequest) {
     if (!userId) {
       return Response.json(
         { error: 'userId is required parameter' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -79,7 +82,10 @@ export async function DELETE(req: NextRequest) {
     if (!memoryId) {
       return Response.json(
         { error: 'memoryId is required in request body' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 

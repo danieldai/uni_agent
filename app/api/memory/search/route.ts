@@ -39,7 +39,10 @@ export async function GET(req: NextRequest) {
     if (!query || !userId) {
       return Response.json(
         { error: 'query and userId are required parameters' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -47,7 +50,10 @@ export async function GET(req: NextRequest) {
     if (isNaN(limit) || limit < 1 || limit > 100) {
       return Response.json(
         { error: 'limit must be between 1 and 100' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -55,7 +61,10 @@ export async function GET(req: NextRequest) {
     if (maxTokens !== undefined && (isNaN(maxTokens) || maxTokens < 1)) {
       return Response.json(
         { error: 'maxTokens must be a positive number' },
-        { status: 400 }
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
