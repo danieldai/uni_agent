@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'AI Agent',
   webDir: 'out',  // Points to Next.js static export output directory
   server: {
-    androidScheme: 'https',
+    androidScheme: 'http',  // Changed to http for development to allow cleartext API calls
   },
 };
 
