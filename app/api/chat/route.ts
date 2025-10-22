@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { MemoryService } from '@/lib/memory/MemoryService';
 import { buildSystemPromptWithMemories } from '@/lib/memory/utils/contextBuilder';
 import { memoryConfig } from '@/lib/memory/config';
+import { corsHeaders } from '@/lib/cors';
 
 // Create an OpenAI API client (configured with custom base URL if provided)
 const openai = new OpenAI({
@@ -11,6 +12,14 @@ const openai = new OpenAI({
 
 // Use nodejs runtime for memory service compatibility
 export const runtime = 'nodejs';
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -106,6 +115,7 @@ export async function POST(req: Request) {
     // Respond with the stream
     return new Response(stream, {
       headers: {
+        ...corsHeaders,
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
         'X-Memories-Retrieved': memoriesRetrieved.toString(),
@@ -120,7 +130,10 @@ export async function POST(req: Request) {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        }
       }
     );
   }

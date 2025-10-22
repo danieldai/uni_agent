@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { memoryApi } from '@/lib/api-client';
 
 interface Memory {
   id: string;
@@ -27,7 +28,7 @@ export function MemoryViewer({ userId }: MemoryViewerProps) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/memory?userId=${userId}`);
+      const response = await memoryApi.getAll(userId);
       const data = await response.json();
 
       if (data.success) {
@@ -49,14 +50,7 @@ export function MemoryViewer({ userId }: MemoryViewerProps) {
     }
 
     try {
-      const response = await fetch('/api/memory', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ memoryId }),
-      });
-
+      const response = await memoryApi.delete(memoryId);
       const data = await response.json();
 
       if (data.success) {

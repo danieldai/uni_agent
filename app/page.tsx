@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Message } from './types/chat';
 import { MemoryViewer } from './components/MemoryViewer';
+import { chatApi } from '@/lib/api-client';
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -48,19 +49,13 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(({ role, content }) => ({
-            role,
-            content,
-          })),
-          userId, // Add userId to request
-        }),
-      });
+      const response = await chatApi.send(
+        [...messages, userMessage].map(({ role, content }) => ({
+          role,
+          content,
+        })),
+        userId
+      );
 
       if (!response.ok) {
         throw new Error('Failed to get response');
