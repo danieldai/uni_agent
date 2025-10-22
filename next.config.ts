@@ -1,10 +1,17 @@
 import type { NextConfig } from "next";
 
+// Check if building for mobile (static export) or web (with APIs)
+const isMobileBuild = process.env.BUILD_TARGET === 'mobile';
+const isWebBuild = process.env.BUILD_TARGET === 'web';
+
 const nextConfig: NextConfig = {
-  output: 'export',           // Enable static export for Capacitor
+  // Static export for mobile, standalone for web Docker, default for dev
+  ...(isMobileBuild ? { output: 'export' } : {}),
+  ...(isWebBuild ? { output: 'standalone' } : {}),
+
   trailingSlash: true,        // Better mobile compatibility
   images: {
-    unoptimized: true,        // Required for Capacitor static export
+    unoptimized: isMobileBuild, // Only unoptimized for mobile builds
   },
   eslint: {
     ignoreDuringBuilds: true, // Disable linting during build

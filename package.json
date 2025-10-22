@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build:web": "BUILD_TARGET=web next build",
     "start": "next start",
     "lint": "eslint",
-    "build:mobile": "next build",
+    "build:mobile": "mv app/api api_backup_temp && BUILD_TARGET=mobile next build && mv api_backup_temp app/api",
     "cap:sync": "cap sync",
     "cap:copy": "cap copy",
     "cap:update": "cap update",

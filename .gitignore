@@ -45,3 +45,6 @@ next-env.d.ts
 /data/*.db-shm
 /data/*.db-wal
 /data/*.backup
+
+# temporary api backup during mobile builds
+api_backup_temp/
