@@ -8,7 +8,7 @@
 import { Capacitor } from '@capacitor/core';
 import { getPlatform, isNativePlatform } from './platform';
 
-export type Capability = 
+export type Capability =
   | 'camera'
   | 'geolocation'
   | 'filesystem'

@@ -5,6 +5,8 @@
  * Handles both web (relative URLs) and mobile (absolute URLs) deployments
  */
 
+import { Message } from '@/app/types/chat';
+
 // Get API base URL from environment or use relative path for web
 const getApiBaseUrl = (): string => {
   // For mobile builds, use NEXT_PUBLIC_API_URL
@@ -51,7 +53,7 @@ export async function apiRequest(
  * Chat API
  */
 export const chatApi = {
-  send: async (messages: Array<{ role: string; content: string }>, userId: string) => {
+  send: async (messages: Message[], userId: string) => {
     return apiRequest('/chat', {
       method: 'POST',
       body: JSON.stringify({ messages, userId }),

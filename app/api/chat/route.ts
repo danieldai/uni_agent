@@ -3,6 +3,7 @@ import { MemoryService } from '@/lib/memory/MemoryService';
 import { buildSystemPromptWithMemories } from '@/lib/memory/utils/contextBuilder';
 import { memoryConfig } from '@/lib/memory/config';
 import { corsHeaders } from '@/lib/cors';
+import { Message, OpenAIMessage, OpenAIMessageContent } from '@/app/types/chat';
 
 // Create an OpenAI API client (configured with custom base URL if provided)
 const openai = new OpenAI({
@@ -19,6 +20,57 @@ export async function OPTIONS() {
     status: 200,
     headers: corsHeaders,
   });
+}
+
+/**
+ * Convert Message with images to OpenAI compatible format
+ */
+function convertToOpenAIMessage(message: Message): OpenAIMessage {
+  // If message has no images, return simple string content
+  if (!message.images || message.images.length === 0) {
+    return {
+      role: message.role,
+      content: message.content
+    };
+  }
+
+  // Build multimodal content array
+  const content: OpenAIMessageContent = [];
+
+  // Add text content if present
+  if (message.content.trim()) {
+    content.push({
+      type: 'text',
+      text: message.content
+    });
+  }
+
+  // Add images
+  message.images.forEach(image => {
+    const imageUrl = image.type === 'base64'
+      ? `data:${image.mimeType || 'image/jpeg'};base64,${image.data}`
+      : image.data;
+
+    content.push({
+      type: 'image_url',
+      image_url: {
+        url: imageUrl,
+        detail: 'auto'
+      }
+    });
+  });
+
+  return {
+    role: message.role,
+    content
+  };
+}
+
+/**
+ * Get text content from message for memory extraction
+ */
+function getTextContent(message: Message): string {
+  return message.content;
 }
 
 export async function POST(req: Request) {
@@ -41,6 +93,9 @@ export async function POST(req: Request) {
       });
     }
 
+    // Type cast messages to our Message interface
+    const typedMessages: Message[] = messages;
+
     let memories: any[] = [];
     let memoriesRetrieved = 0;
 
@@ -48,7 +103,7 @@ export async function POST(req: Request) {
     if (memoryConfig.enabled) {
       try {
         const memoryService = new MemoryService();
-        const lastUserMessage = messages[messages.length - 1]?.content || '';
+        const lastUserMessage = getTextContent(typedMessages[typedMessages.length - 1]) || '';
         memories = await memoryService.search(lastUserMessage, userId, 5);
         memoriesRetrieved = memories.length;
         console.log(`Retrieved ${memoriesRetrieved} memories for user ${userId}`);
@@ -61,14 +116,21 @@ export async function POST(req: Request) {
     // Build system prompt with memories
     const systemPrompt = buildSystemPromptWithMemories(memories);
 
+    // Convert messages to OpenAI format (handles images)
+    const openAIMessages = typedMessages.map(convertToOpenAIMessage);
+
     // Prepare messages with memory context
     const contextMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages
+      { role: 'system' as const, content: systemPrompt },
+      ...openAIMessages
     ];
 
-    // Get the model from environment or use default
-    const model = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
+    // Check if any message contains images - use vision model if so
+    const hasImages = typedMessages.some(msg => msg.images && msg.images.length > 0);
+    const defaultModel = hasImages ? 'gpt-4o' : 'gpt-3.5-turbo';
+    const model = process.env.OPENAI_MODEL || defaultModel;
+
+    console.log(`Using model: ${model}, hasImages: ${hasImages}`);
 
     // Ask OpenAI for a streaming chat completion
     const response = await openai.chat.completions.create({
@@ -96,9 +158,11 @@ export async function POST(req: Request) {
           controller.close();
 
           // Extract and store memories in background (non-blocking)
-          if (memoryConfig.enabled && userId && messages.length > 0) {
+          if (memoryConfig.enabled && userId && typedMessages.length > 0) {
+            // Only store text content in memories (exclude images for now)
+            const lastMessage = typedMessages[typedMessages.length - 1];
             const conversationForMemory = [
-              messages[messages.length - 1],
+              { role: lastMessage.role, content: getTextContent(lastMessage) },
               { role: 'assistant', content: fullResponse }
             ];
 
