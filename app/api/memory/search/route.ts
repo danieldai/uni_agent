@@ -9,10 +9,21 @@
 
 import { NextRequest } from 'next/server';
 import { MemoryService } from '@/lib/memory/MemoryService';
+import { corsHeaders } from '@/lib/cors';
 
 export const runtime = 'nodejs';
 
 const memoryService = new MemoryService();
+
+/**
+ * OPTIONS - Handle CORS preflight
+ */
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -56,6 +67,8 @@ export async function GET(req: NextRequest) {
       query,
       results,
       count: results.length,
+    }, {
+      headers: corsHeaders,
     });
 
   } catch (error: any) {
@@ -66,7 +79,10 @@ export async function GET(req: NextRequest) {
         success: false,
         error: error.message || 'An error occurred during memory search'
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }

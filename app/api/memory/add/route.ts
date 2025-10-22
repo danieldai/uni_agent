@@ -16,10 +16,21 @@
 import { NextRequest } from 'next/server';
 import { MemoryService } from '@/lib/memory/MemoryService';
 import { Message } from '@/lib/memory/types';
+import { corsHeaders } from '@/lib/cors';
 
 export const runtime = 'nodejs';
 
 const memoryService = new MemoryService();
+
+/**
+ * OPTIONS - Handle CORS preflight
+ */
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -73,6 +84,8 @@ export async function POST(req: NextRequest) {
       success: true,
       result,
       message: `Processed ${formattedMessages.length} messages, extracted ${result.results.length} memory actions`,
+    }, {
+      headers: corsHeaders,
     });
 
   } catch (error: any) {
@@ -83,7 +96,10 @@ export async function POST(req: NextRequest) {
         success: false,
         error: error.message || 'An error occurred while adding memories'
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }

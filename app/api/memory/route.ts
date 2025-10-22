@@ -10,10 +10,21 @@
 
 import { NextRequest } from 'next/server';
 import { MemoryService } from '@/lib/memory/MemoryService';
+import { corsHeaders } from '@/lib/cors';
 
 export const runtime = 'nodejs';
 
 const memoryService = new MemoryService();
+
+/**
+ * OPTIONS - Handle CORS preflight
+ */
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 /**
  * GET - Retrieve all memories for a user
@@ -37,6 +48,8 @@ export async function GET(req: NextRequest) {
       success: true,
       results,
       count: results.length,
+    }, {
+      headers: corsHeaders,
     });
 
   } catch (error: any) {
@@ -47,7 +60,10 @@ export async function GET(req: NextRequest) {
         success: false,
         error: error.message || 'An error occurred while retrieving memories'
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }
@@ -74,6 +90,8 @@ export async function DELETE(req: NextRequest) {
       success: true,
       message: 'Memory deleted successfully',
       memoryId,
+    }, {
+      headers: corsHeaders,
     });
 
   } catch (error: any) {
@@ -84,7 +102,10 @@ export async function DELETE(req: NextRequest) {
         success: false,
         error: error.message || 'An error occurred while deleting memory'
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }
