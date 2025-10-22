@@ -28,14 +28,16 @@ export async function POST(req: Request) {
     // Validate messages
     if (!messages || !Array.isArray(messages)) {
       return new Response('Invalid request: messages array is required', {
-        status: 400
+        status: 400,
+        headers: corsHeaders,
       });
     }
 
     // Validate userId
     if (!userId) {
       return new Response('Invalid request: userId is required', {
-        status: 400
+        status: 400,
+        headers: corsHeaders,
       });
     }
 

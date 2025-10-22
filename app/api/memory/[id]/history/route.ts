@@ -9,10 +9,21 @@
 
 import { NextRequest } from 'next/server';
 import { MemoryService } from '@/lib/memory/MemoryService';
+import { corsHeaders } from '@/lib/cors';
 
 export const runtime = 'nodejs';
 
 const memoryService = new MemoryService();
+
+/**
+ * OPTIONS - Handle CORS preflight
+ */
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 export async function GET(
   req: NextRequest,
@@ -25,7 +36,10 @@ export async function GET(
     if (!memoryId) {
       return Response.json(
         { error: 'memoryId is required' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -37,6 +51,8 @@ export async function GET(
       memoryId,
       history,
       count: history.length,
+    }, {
+      headers: corsHeaders,
     });
 
   } catch (error: any) {
@@ -47,7 +63,10 @@ export async function GET(
         success: false,
         error: error.message || 'An error occurred while retrieving memory history'
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }

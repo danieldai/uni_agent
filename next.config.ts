@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   ...(isMobileBuild ? { output: 'export' } : {}),
   ...(isWebBuild ? { output: 'standalone' } : {}),
 
-  trailingSlash: true,        // Better mobile compatibility
+  trailingSlash: false,       // Prevent trailing slash redirects on API routes
   images: {
     unoptimized: isMobileBuild, // Only unoptimized for mobile builds
   },

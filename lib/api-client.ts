@@ -26,7 +26,7 @@ export async function apiRequest(
   options?: RequestInit
 ): Promise<Response> {
   // Ensure endpoint ends with trailing slash for Next.js config compatibility
-  const normalizedEndpoint = endpoint.endsWith('/') ? endpoint : `${endpoint}/`;
+  const normalizedEndpoint = endpoint;//.endsWith('/') ? endpoint : `${endpoint}/`;
   const url = `${API_BASE_URL}${normalizedEndpoint}`;
 
   console.log(`[API] ${options?.method || 'GET'} ${url}`);
