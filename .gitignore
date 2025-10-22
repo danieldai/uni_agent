@@ -48,3 +48,7 @@ next-env.d.ts
 
 # temporary api backup during mobile builds
 api_backup_temp/
+
+
+# IDEs and editors
+.idea/
