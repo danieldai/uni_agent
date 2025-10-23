@@ -1,0 +1,44 @@
+{
+  "appId": "com.danieldai.aiagent",
+  "productName": "AI Agent",
+  "directories": {
+    "buildResources": "resources"
+  },
+  "files": [
+    "assets/**/*",
+    "build/**/*",
+    "capacitor.config.*",
+    "app/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "target": "dmg",
+    "icon": "assets/appIcon.png",
+    "identity": null,
+    "gatekeeperAssess": false,
+    "hardenedRuntime": false,
+    "entitlements": null,
+    "entitlementsInherit": null
+  },
+  "dmg": {
+    "title": "AI Agent",
+    "icon": "assets/appIcon.png",
+    "background": null,
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  }
+}
