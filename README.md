@@ -1,30 +1,49 @@
-# AI Chatbot with OpenAI-Compatible API
+# AI Agent with Memory & Multi-Platform Support
 
-A modern, streaming chatbot built with Next.js 15, TypeScript, and Tailwind CSS that works with OpenAI and any OpenAI-compatible API providers.
+A sophisticated AI chatbot with persistent memory built with Next.js 15, TypeScript, and OpenSearch. Features cross-platform support for web, Electron desktop, and mobile (iOS/Android) via Capacitor.
 
 ## 🎯 Project Status
 
 **Current Version:** 0.1.0
 **Status:** ✅ Fully Functional
-**Last Updated:** January 2025
+**Last Updated:** October 2025
 
 ### Recent Updates
-- ✅ Initial chatbot implementation with streaming support
-- ✅ OpenAI SDK integration (v6.5.0)
-- ✅ Full-screen responsive UI with dark mode
-- ✅ Environment-based configuration for multiple providers
-- ✅ Edge Runtime optimization
+- ✅ Advanced memory system with OpenSearch vector storage
+- ✅ Fact extraction and semantic memory retrieval
+- ✅ Electron desktop app support
+- ✅ Capacitor mobile app support (iOS & Android)
+- ✅ Image upload support on native platforms
+- ✅ Multi-platform build system (web, desktop, mobile)
+- ✅ Persistent conversation memory with similarity search
+- ✅ Real-time streaming responses
+- ✅ SQLite-based history tracking
 
 ## ✨ Features
 
+### Core Capabilities
 - 🚀 **Real-time Streaming** - See AI responses appear word-by-word
+- 🧠 **Persistent Memory** - AI remembers facts from previous conversations using vector similarity search
 - 💬 **Modern UI** - Clean interface with dark mode support
 - 🔄 **Auto-scrolling** - Automatically follows the conversation
 - 🎨 **Tailwind CSS** - Beautiful gradient design and responsive layout
 - 🔌 **Multi-Provider** - Works with OpenAI, OpenRouter, Groq, and more
-- ⚡️ **Edge Runtime** - Fast performance with Next.js 15 App Router
 - 🔒 **Secure** - API keys stored in environment variables
-- 📱 **Responsive** - Works seamlessly on desktop and mobile
+
+### Multi-Platform Support
+- 🌐 **Web App** - Next.js web application with full API support
+- 💻 **Desktop App** - Electron-based native desktop application (macOS, Windows, Linux)
+- 📱 **Mobile Apps** - Native iOS and Android apps via Capacitor
+- 📷 **Image Upload** - Camera and photo library access on mobile/desktop
+- 🔄 **Cross-Platform** - Shared codebase across all platforms
+
+### Memory System
+- 🎯 **Semantic Search** - Find relevant memories using vector embeddings
+- 📝 **Fact Extraction** - Automatically extracts important information from conversations
+- 🔍 **Smart Retrieval** - Contextual memory lookup based on conversation topics
+- 📊 **History Tracking** - Complete audit trail of memory changes (ADD/UPDATE/DELETE)
+- 💾 **OpenSearch Integration** - Scalable vector storage for millions of memories
+- 🗄️ **SQLite History** - Lightweight local history database
 
 ## 🔌 Supported API Providers
 
@@ -43,12 +62,18 @@ Plus any other service with OpenAI-compatible endpoints!
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- Node.js 20+ installed
+- OpenSearch instance running (for memory features)
+- API key from OpenAI or compatible provider
+
 ### 1. Clone and Install
 
 ```bash
-# Clone the repository (if not already done)
+# Clone the repository
 git clone <your-repo-url>
-cd memory_with_opensearch
+cd uni_agent
 
 # Install dependencies
 npm install
@@ -56,106 +81,237 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Create or edit the `.env.local` file in the root directory with your API credentials:
+Create `.env.local` file in the root directory (see `.env.example` for reference):
 
 ```env
-# For OpenAI
+# OpenAI API Configuration
 OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_API_KEY=sk-your-openai-api-key-here
+OPENAI_API_KEY=sk-your-api-key-here
 OPENAI_MODEL=gpt-3.5-turbo
 
-# For OpenRouter
-# OPENAI_BASE_URL=https://openrouter.ai/api/v1
-# OPENAI_API_KEY=sk-or-v1-your-key-here
-# OPENAI_MODEL=openai/gpt-3.5-turbo
+# Memory Service Configuration
+MEMORY_ENABLED=true
+OPENSEARCH_NODE=http://localhost:9200
+OPENSEARCH_USERNAME=admin
+OPENSEARCH_PASSWORD=YourStrongPassword123!
+OPENSEARCH_INDEX=chatbot_memories
 
-# For Groq
-# OPENAI_BASE_URL=https://api.groq.com/openai/v1
-# OPENAI_API_KEY=gsk_your-groq-api-key-here
-# OPENAI_MODEL=mixtral-8x7b-32768
+# Embedding Configuration
+EMBEDDING_PROVIDER=openai
+EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIMENSIONS=1536
 
-# For Together AI
-# OPENAI_BASE_URL=https://api.together.xyz/v1
-# OPENAI_API_KEY=your-together-api-key-here
-# OPENAI_MODEL=mistralai/Mixtral-8x7B-Instruct-v0.1
+# Memory Behavior
+MEMORY_SIMILARITY_THRESHOLD=0.7
+MEMORY_RETRIEVAL_LIMIT=5
+MEMORY_EXTRACTION_ENABLED=true
+
+# Database Configuration
+DATABASE_URL=file:./data/chatbot.db
+
+# For mobile/desktop apps
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
-### 3. Run the Development Server
+### 3. Set Up OpenSearch (Optional - for memory features)
 
+```bash
+# Using Docker
+docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" \
+  -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=YourStrongPassword123!" \
+  opensearchproject/opensearch:latest
+```
+
+### 4. Run the Application
+
+#### Web Development Server
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to start chatting!
+#### Electron Desktop App
+```bash
+npm run electron:dev
+```
 
-### 4. Start Chatting
+#### Mobile Apps
+```bash
+# Build for mobile
+npm run build:mobile
 
-Once the server is running:
-1. Type your message in the input field at the bottom
-2. Click "Send" or press Enter
-3. Watch the AI response stream in real-time
-4. Continue the conversation!
+# Sync with Capacitor
+npm run cap:sync
+
+# Open in Xcode (iOS)
+npm run cap:ios
+
+# Open in Android Studio (Android)
+npm run cap:android
+```
 
 ## 📁 Project Structure
 
 ```
-memory_with_opensearch/
+uni_agent/
 ├── app/
 │   ├── api/
-│   │   └── chat/
-│   │       └── route.ts      # API endpoint with streaming support
+│   │   ├── chat/
+│   │   │   └── route.ts           # Chat API with streaming & memory
+│   │   └── memory/
+│   │       ├── route.ts           # Get all memories
+│   │       ├── add/route.ts       # Add new memories
+│   │       ├── search/route.ts    # Search memories
+│   │       └── [id]/history/route.ts # Memory history
+│   ├── components/
+│   │   ├── MemoryViewer.tsx       # UI for viewing memories
+│   │   └── PlatformInfo.tsx       # Platform detection component
 │   ├── types/
-│   │   └── chat.ts           # TypeScript interfaces for messages
-│   ├── layout.tsx            # Root layout with metadata
-│   ├── page.tsx              # Main chatbot UI (client component)
-│   └── globals.css           # Global Tailwind styles
-├── .env.local                # Environment variables (not in git)
-├── package.json              # Dependencies (Next.js 15, OpenAI 6.5.0)
-├── tsconfig.json             # TypeScript configuration
-└── README.md                 # This file
+│   │   └── chat.ts                # TypeScript interfaces
+│   ├── layout.tsx                 # Root layout
+│   ├── page.tsx                   # Main chat UI
+│   └── globals.css                # Tailwind styles
+├── lib/
+│   ├── memory/
+│   │   ├── MemoryService.ts       # Core memory orchestration
+│   │   ├── stores/
+│   │   │   ├── OpenSearchStore.ts # Vector storage
+│   │   │   └── HistoryStore.ts    # SQLite history
+│   │   ├── extractors/
+│   │   │   ├── FactExtractor.ts   # Extract facts from chat
+│   │   │   └── ActionDecider.ts   # Decide memory actions
+│   │   ├── embeddings/
+│   │   │   └── OpenAIEmbedding.ts # Generate embeddings
+│   │   └── utils/
+│   │       ├── contextBuilder.ts  # Build context from memories
+│   │       ├── tokenBudget.ts     # Manage token limits
+│   │       └── hash.ts            # Hash utilities
+│   ├── api-client.ts              # Platform-aware API client
+│   └── platform.ts                # Platform detection
+├── electron/
+│   ├── src/
+│   │   ├── index.ts               # Electron main process
+│   │   └── preload.ts             # Preload script
+│   └── package.json               # Electron dependencies
+├── android/                       # Android Capacitor project
+├── ios/                           # iOS Capacitor project
+├── capacitor.config.ts            # Capacitor configuration
+├── next.config.ts                 # Next.js multi-platform config
+├── .env.local                     # Environment variables (not in git)
+├── .env.example                   # Example environment config
+└── package.json                   # Main dependencies
 ```
 
-### Key Files
+### Key Components
 
-- **[app/api/chat/route.ts](app/api/chat/route.ts)** - Edge Runtime API route that handles OpenAI streaming
-- **[app/page.tsx](app/page.tsx)** - React client component with chat interface and state management
-- **[app/types/chat.ts](app/types/chat.ts)** - TypeScript definitions for Message and ChatResponse
-- **[.env.local](.env.local)** - Configuration for API keys and provider settings
+#### Memory System
+- **[lib/memory/MemoryService.ts](lib/memory/MemoryService.ts)** - Orchestrates all memory operations
+- **[lib/memory/stores/OpenSearchStore.ts](lib/memory/stores/OpenSearchStore.ts)** - Vector database integration
+- **[lib/memory/extractors/FactExtractor.ts](lib/memory/extractors/FactExtractor.ts)** - AI-powered fact extraction
+- **[lib/memory/extractors/ActionDecider.ts](lib/memory/extractors/ActionDecider.ts)** - Smart memory management decisions
+
+#### API Routes
+- **[app/api/chat/route.ts](app/api/chat/route.ts)** - Chat endpoint with memory integration
+- **[app/api/memory/route.ts](app/api/memory/route.ts)** - Memory management endpoints
+
+#### Frontend
+- **[app/page.tsx](app/page.tsx)** - Main chat interface with image upload support
+- **[app/components/MemoryViewer.tsx](app/components/MemoryViewer.tsx)** - Memory browsing UI
+
+#### Platform Support
+- **[lib/platform.ts](lib/platform.ts)** - Platform detection utilities
+- **[lib/api-client.ts](lib/api-client.ts)** - Cross-platform API client
+- **[capacitor.config.ts](capacitor.config.ts)** - Mobile app configuration
+- **[electron/](electron/)** - Desktop app setup
 
 ## 🔧 How It Works
 
-### Architecture Flow
+### Architecture Overview
 
 ```
-User Input → Frontend (React) → API Route (Edge) → OpenAI SDK → AI Provider
-                ↑                                                      ↓
-                └──────────────── Streaming Response ─────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        User Interface                            │
+│  (Web Browser / Electron Desktop / iOS / Android App)           │
+└──────────────────────┬──────────────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Next.js API Routes                            │
+│  ┌──────────────────┐         ┌──────────────────────┐          │
+│  │   /api/chat      │         │   /api/memory/*      │          │
+│  │  (streaming)     │         │  (CRUD operations)   │          │
+│  └────────┬─────────┘         └──────────┬───────────┘          │
+└───────────┼────────────────────────────────┼──────────────────────┘
+            │                                │
+            ▼                                ▼
+┌──────────────────────┐         ┌──────────────────────┐
+│   OpenAI API         │         │   Memory Service     │
+│  (Streaming Chat)    │         │  (Fact Extraction)   │
+└──────────────────────┘         └──────────┬───────────┘
+                                            │
+                    ┌───────────────────────┼────────────────────────┐
+                    ▼                       ▼                        ▼
+         ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐
+         │ OpenSearch       │   │ OpenAI Embeddings│   │ SQLite (History)   │
+         │ (Vector Store)   │   │ (text-embedding) │   │ (Audit Trail)      │
+         └──────────────────┘   └──────────────────┘   └────────────────────┘
 ```
+
+### Memory System Flow
+
+1. **Conversation Input** → User sends message to chat
+2. **Fact Extraction** → AI analyzes conversation and extracts important facts
+3. **Embedding Generation** → Facts converted to vector embeddings
+4. **Similarity Search** → Search existing memories for related content
+5. **Action Decision** → AI decides: ADD new / UPDATE existing / DELETE outdated / NONE
+6. **Storage** → Execute actions in OpenSearch (vectors) & SQLite (history)
+7. **Retrieval** → When user asks question, relevant memories retrieved via semantic search
+8. **Context Building** → Memories injected into chat context for AI awareness
+
+### Platform-Specific Features
+
+#### Web App
+- Full API routes available (Next.js server)
+- Direct database connections
+- Server-side memory processing
+
+#### Electron Desktop
+- Static export of Next.js app
+- Bundled with Electron shell
+- Native file system access
+- API calls to separate backend or embedded server
+
+#### Mobile Apps (iOS/Android)
+- Static export via Capacitor
+- Native camera/photo access
+- API calls to backend server
+- Offline-first capability with local storage
 
 ### Component Breakdown
 
 1. **Frontend** ([app/page.tsx](app/page.tsx)):
-   - React client component with `useState` and `useEffect` hooks
-   - Manages message history and input state
-   - Sends POST requests to `/api/chat` endpoint
-   - Reads and renders streaming responses in real-time
-   - Auto-scrolls to latest message
+   - React client with real-time streaming
+   - Image upload support on native platforms
+   - Memory viewer component
+   - Platform-aware API client
 
-2. **Backend API** ([app/api/chat/route.ts](app/api/chat/route.ts)):
-   - Next.js API route with Edge Runtime for optimal performance
-   - Initializes OpenAI client with configurable base URL
-   - Accepts message array and forwards to AI provider
-   - Returns `ReadableStream` for token-by-token streaming
-   - Error handling with proper HTTP status codes
+2. **Chat API** ([app/api/chat/route.ts](app/api/chat/route.ts)):
+   - Streaming responses via OpenAI SDK
+   - Memory integration for context
+   - Automatic fact extraction after responses
+   - Token budget management
 
-3. **Configuration** ([.env.local](.env.local)):
-   - Stores API credentials securely outside of codebase
-   - Allows switching providers without code changes
-   - Protected by `.gitignore` (never committed to version control)
+3. **Memory Service** ([lib/memory/MemoryService.ts](lib/memory/MemoryService.ts)):
+   - Orchestrates fact extraction, embedding, and storage
+   - Manages ADD/UPDATE/DELETE operations
+   - Semantic search with similarity scoring
+   - History tracking for audit trail
 
-4. **Type Safety** ([app/types/chat.ts](app/types/chat.ts)):
-   - TypeScript interfaces for `Message` and `ChatResponse`
-   - Ensures type safety across frontend and backend
+4. **Vector Storage** ([lib/memory/stores/OpenSearchStore.ts](lib/memory/stores/OpenSearchStore.ts)):
+   - OpenSearch integration for scalable vector search
+   - Cosine similarity scoring
+   - Metadata filtering by user_id
+   - Efficient batch operations
 
 ## 🎨 Customization
 
@@ -261,20 +417,32 @@ If you encounter issues not listed here:
 ### Available Scripts
 
 ```bash
-# Install dependencies
-npm install
+# Development
+npm run dev                    # Run Next.js dev server
+npm run electron:dev           # Build and run Electron app
+npm run mobile:dev             # Build for mobile and open in IDE
 
-# Run development server (with Turbopack)
-npm run dev
+# Building
+npm run build                  # Build for web (with API routes)
+npm run build:web              # Build standalone web server
+npm run build:mobile           # Build static export for mobile
+npm run build:electron         # Build static export for Electron
 
-# Build for production (with Turbopack)
-npm run build
+# Electron Desktop
+npm run electron:build         # Build Electron app
+npm run electron:package       # Package Electron app for distribution
+npm run cap:electron           # Open Electron project
 
-# Start production server
-npm start
+# Mobile (Capacitor)
+npm run cap:sync               # Sync web build to mobile platforms
+npm run cap:copy               # Copy web files to mobile
+npm run cap:update             # Update Capacitor dependencies
+npm run cap:ios                # Open iOS project in Xcode
+npm run cap:android            # Open Android project in Android Studio
 
-# Run ESLint
-npm run lint
+# Other
+npm start                      # Start production server
+npm run lint                   # Run ESLint
 ```
 
 ### Tech Stack
@@ -286,38 +454,107 @@ npm run lint
 | **TypeScript** | 5+ | Type safety |
 | **Tailwind CSS** | 4 | Styling framework |
 | **OpenAI SDK** | 6.5.0 | AI provider integration |
+| **OpenSearch** | 3.5.1 | Vector database for memories |
+| **SQLite (better-sqlite3)** | 12.4.1 | Local history storage |
+| **Capacitor** | 7.4.3 | Native mobile wrapper |
+| **Electron** | 38.4.0 | Desktop app framework |
 
 ### Key Technologies
 
-- **Turbopack** - Fast bundler for development and production
-- **Edge Runtime** - Deployed at the edge for low latency
-- **Server Components** - Optimized rendering strategy
-- **Streaming** - Real-time response delivery
+- **Vector Embeddings** - Semantic search using OpenAI text-embedding-3
+- **Streaming** - Real-time AI response delivery
+- **Cross-Platform** - Single codebase for web, desktop, and mobile
+- **Memory System** - Persistent conversation context with fact extraction
+- **OpenSearch** - Scalable vector similarity search
+- **Capacitor Camera** - Native camera and photo access
 
 ## 🚀 Deployment
 
-### Deploy to Vercel
+### Web Application
 
-The easiest way to deploy this chatbot:
+#### Deploy to Vercel (Recommended for Web)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
-
-1. Click the button above or go to [Vercel](https://vercel.com)
-2. Import your repository
-3. Add environment variables:
+1. Go to [Vercel](https://vercel.com) and import your repository
+2. Add environment variables:
    - `OPENAI_API_KEY`
    - `OPENAI_BASE_URL`
    - `OPENAI_MODEL`
-4. Deploy!
+   - `OPENSEARCH_NODE` (external OpenSearch instance)
+   - `OPENSEARCH_USERNAME`
+   - `OPENSEARCH_PASSWORD`
+   - `DATABASE_URL` (PostgreSQL recommended for production)
+   - All other env vars from `.env.example`
+3. Deploy!
 
-### Deploy to Other Platforms
+#### Docker Deployment
 
-This is a standard Next.js app and can be deployed to:
-- **Netlify** - Full Next.js support
-- **Railway** - Simple deployment with environment variables
-- **Fly.io** - Docker-based deployment
-- **AWS Amplify** - Integrated with AWS services
-- **Self-hosted** - Use `npm run build` and `npm start`
+```bash
+# Build web version
+BUILD_TARGET=web npm run build
+
+# Run with Docker
+docker build -t ai-agent .
+docker run -p 3000:3000 --env-file .env.local ai-agent
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed Docker instructions.
+
+### Desktop Application (Electron)
+
+```bash
+# Build for current platform
+npm run electron:build
+
+# Package for distribution
+npm run electron:package
+
+# Distributable app will be in electron/dist/
+```
+
+Supports macOS, Windows, and Linux builds via electron-builder.
+
+### Mobile Applications
+
+#### iOS
+
+1. Build and sync: `npm run mobile:dev`
+2. Open Xcode: Project opens automatically
+3. Configure signing in Xcode
+4. Build and run on device/simulator
+
+Requirements:
+- macOS with Xcode installed
+- Apple Developer account for device deployment
+
+#### Android
+
+1. Build and sync: `npm run build:mobile && npm run cap:sync`
+2. Open Android Studio: `npm run cap:android`
+3. Configure signing in Android Studio
+4. Build APK or AAB for distribution
+
+Requirements:
+- Android Studio installed
+- Android SDK configured
+
+### Production Considerations
+
+#### Memory System Setup
+- Use managed OpenSearch service (AWS OpenSearch, Elastic Cloud)
+- Set up PostgreSQL for production history storage
+- Configure proper backup strategies
+- Set appropriate similarity thresholds for your use case
+
+#### API Configuration
+- For mobile/desktop: Point `NEXT_PUBLIC_API_URL` to your web server
+- Use environment-specific configs
+- Enable CORS for cross-origin requests from native apps
+
+#### Security
+- Never commit `.env.local` or API keys
+- Use environment variables for all sensitive data
+- Implement rate limiting on API routes
+- Add authentication for production deployments
 
 ## 📝 License
 
@@ -335,13 +572,30 @@ Contributions are welcome! Here's how:
 
 ### Ideas for Contributions
 
-- 🎨 Additional UI themes
-- 💾 Conversation history persistence
-- 🔊 Text-to-speech integration
-- 📸 Image generation support
-- 🌐 Multi-language support
-- 🔐 User authentication
-- 📊 Usage analytics dashboard
+- 🎨 Additional UI themes and customization options
+- 🌐 Multi-language support with i18n
+- 🔐 User authentication and multi-user support
+- 📊 Analytics dashboard for memory usage
+- 🔊 Text-to-speech and voice input
+- 📸 Image generation support (DALL-E integration)
+- 🔗 Memory graph visualization
+- 📤 Export/import memory backups
+- 🧪 Additional embedding providers (Cohere, local models)
+- 📝 Conversation templates and prompts library
+- 🔔 Push notifications for mobile apps
+- 🌙 Advanced memory management (tagging, categories)
+
+## 💡 Use Cases
+
+This project demonstrates several advanced AI application patterns:
+
+- **Personal AI Assistant** - Remember user preferences, facts, and context across conversations
+- **Customer Support Bot** - Maintain customer history and preferences
+- **Educational Tutor** - Track student progress and learning patterns
+- **Research Assistant** - Build knowledge base from conversations
+- **Desktop Productivity Tool** - Native desktop app with AI capabilities
+- **Mobile AI App** - On-the-go AI assistance with camera integration
+- **Knowledge Management** - Extract and organize information automatically
 
 ## ⭐ Support
 
@@ -349,7 +603,31 @@ If you find this project helpful, please consider:
 - Giving it a star on GitHub
 - Sharing it with others
 - Contributing improvements
+- Reporting issues or suggesting features
+
+## 📚 Additional Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
+- [OpenSearch Documentation](https://opensearch.org/docs/latest/)
+- [Capacitor Documentation](https://capacitorjs.com/docs)
+- [Electron Documentation](https://www.electronjs.org/docs)
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Detailed deployment guide
+
+## 🏗️ Project Architecture
+
+This project showcases a modern full-stack AI application with:
+
+- **Monorepo Structure** - Single codebase for web, desktop, and mobile
+- **Vector Database Integration** - Semantic memory with OpenSearch
+- **AI-Powered Features** - Fact extraction, embedding generation, memory management
+- **Cross-Platform Support** - React Native-style approach with Capacitor
+- **Real-Time Streaming** - Progressive response rendering
+- **Type Safety** - Full TypeScript coverage
+- **Production Ready** - Docker support, environment management, error handling
 
 ---
 
-**Built with ❤️ using Next.js 15 and OpenAI SDK**
+**Built with Next.js 15, OpenAI SDK, OpenSearch, Capacitor & Electron**
+
+*A demonstration of advanced AI application architecture with persistent memory and multi-platform support.*
