@@ -145,25 +145,26 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <header
-        className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700"
-        style={{
-          paddingTop: 'max(env(safe-area-inset-top), 16px)',
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div
+          className="max-w-4xl mx-auto px-4"
+          style={{
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+            paddingBottom: '12px',
+          }}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold text-gray-800 dark:text-white truncate">
                 AI Chatbot
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Powered by OpenAI-compatible API
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                OpenAI-compatible API
               </p>
             </div>
             {isMounted && userId && (
-              <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                User: {userId.slice(0, 20)}...
+              <div className="text-xs text-gray-400 dark:text-gray-500 font-mono ml-2 hidden sm:block">
+                {userId.slice(0, 12)}...
               </div>
             )}
           </div>
@@ -243,13 +244,15 @@ export default function Home() {
       </div>
 
       {/* Input Form */}
-      <div
-        className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg"
-        style={{
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-        }}
-      >
-        <form onSubmit={sendMessage} className="max-w-4xl mx-auto px-4 py-4">
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
+        <form
+          onSubmit={sendMessage}
+          className="max-w-4xl mx-auto px-4"
+          style={{
+            paddingTop: '16px',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+          }}
+        >
           {/* Image Preview */}
           {selectedImages.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
