@@ -120,7 +120,7 @@ export async function POST(req: Request) {
     const openAIMessages = typedMessages.map(convertToOpenAIMessage);
 
     // Prepare messages with memory context
-    const contextMessages = [
+    const contextMessages: any[] = [
       { role: 'system' as const, content: systemPrompt },
       ...openAIMessages
     ];
@@ -133,6 +133,9 @@ export async function POST(req: Request) {
     console.log(`Using model: ${model}, hasImages: ${hasImages}`);
 
     // Ask OpenAI for a streaming chat completion
+    console.log(`[Chat API] Sending request to model: ${model}`);
+    console.log(`[Chat API] Messages count: ${contextMessages.length}`);
+
     const response = await openai.chat.completions.create({
       model,
       stream: true,
@@ -141,6 +144,8 @@ export async function POST(req: Request) {
       max_tokens: 1000,
     });
 
+    console.log('[Chat API] Received response from OpenAI');
+
     // Stream response and collect full text for memory extraction
     const encoder = new TextEncoder();
     let fullResponse = '';
@@ -148,22 +153,38 @@ export async function POST(req: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          console.log('[Chat API] Starting stream processing...');
+          let chunkCount = 0;
+
           for await (const chunk of response) {
+            chunkCount++;
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
               fullResponse += content;
               controller.enqueue(encoder.encode(content));
             }
           }
+
+          console.log(`[Chat API] Stream completed. Total chunks: ${chunkCount}, Response length: ${fullResponse.length}`);
           controller.close();
 
           // Extract and store memories in background (non-blocking)
           if (memoryConfig.enabled && userId && typedMessages.length > 0) {
             // Only store text content in memories (exclude images for now)
             const lastMessage = typedMessages[typedMessages.length - 1];
-            const conversationForMemory = [
-              { role: lastMessage.role, content: getTextContent(lastMessage) },
-              { role: 'assistant', content: fullResponse }
+            const conversationForMemory: Message[] = [
+              {
+                id: lastMessage.id,
+                role: lastMessage.role,
+                content: getTextContent(lastMessage),
+                timestamp: lastMessage.timestamp
+              },
+              {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: fullResponse,
+                timestamp: Date.now()
+              }
             ];
 
             // Fire and forget - don't await
@@ -173,6 +194,7 @@ export async function POST(req: Request) {
               .catch(err => console.error('Memory extraction error:', err));
           }
         } catch (error) {
+          console.error('[Chat API] Stream error:', error);
           controller.error(error);
         }
       },
