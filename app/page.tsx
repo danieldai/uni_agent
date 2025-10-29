@@ -15,13 +15,15 @@ export default function Home() {
   const [memoriesRetrieved, setMemoriesRetrieved] = useState(0);
   const [selectedImages, setSelectedImages] = useState<MessageImage[]>([]);
   const [isNative, setIsNative] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize user ID from localStorage or generate new one
   useEffect(() => {
+    setIsMounted(true);
     let id = localStorage.getItem('userId');
     if (!id) {
-      id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      id = `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       localStorage.setItem('userId', id);
     }
     setUserId(id);
@@ -154,7 +156,7 @@ export default function Home() {
                 Powered by OpenAI-compatible API
               </p>
             </div>
-            {userId && (
+            {isMounted && userId && (
               <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                 User: {userId.slice(0, 20)}...
               </div>
@@ -294,7 +296,7 @@ export default function Home() {
       </div>
 
       {/* Memory Viewer */}
-      <MemoryViewer userId={userId} />
+      {isMounted && <MemoryViewer userId={userId} />}
     </div>
   );
 }

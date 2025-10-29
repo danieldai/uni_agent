@@ -20,6 +20,11 @@ export function MemoryViewer({ userId }: MemoryViewerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const loadMemories = async () => {
     if (!userId) return;
@@ -148,11 +153,15 @@ export function MemoryViewer({ userId }: MemoryViewerProps) {
                         </p>
                         <div className="flex items-center space-x-2 mt-1">
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {new Date(m.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
+                            {isMounted ? (
+                              new Date(m.created_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })
+                            ) : (
+                              'Loading...'
+                            )}
                           </p>
                           {m.updated_at && (
                             <span className="text-xs text-blue-500" title="Updated">
