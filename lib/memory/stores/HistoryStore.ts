@@ -10,6 +10,8 @@ import BetterSqlite3 from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { HistoryEntry } from '../types';
 import { memoryConfig } from '../config';
+import { mkdirSync, readFileSync } from 'fs';
+import { dirname, join } from 'path';
 
 export class HistoryStore {
   private db: Database;
@@ -19,10 +21,118 @@ export class HistoryStore {
     const dbUrl = memoryConfig.database.url;
     const dbPath = dbUrl.replace('file:', '');
 
+    // Ensure the directory exists before creating the database
+    const dbDir = dirname(dbPath);
+    try {
+      mkdirSync(dbDir, { recursive: true });
+    } catch (error) {
+      // Directory already exists or creation failed, continue anyway
+    }
+
     this.db = new BetterSqlite3(dbPath);
 
     // Enable WAL mode for better concurrency
     this.db.pragma('journal_mode = WAL');
+
+    // Initialize database schema
+    this.initializeSchema();
+  }
+
+  /**
+   * Initialize database schema by running migrations
+   * Creates tables if they don't exist
+   */
+  private initializeSchema(): void {
+    // Read and execute migration SQL
+    const migrationPath = join(process.cwd(), 'db', 'migrations', '001_create_memory_tables.sql');
+
+    try {
+      const migrationSQL = readFileSync(migrationPath, 'utf-8');
+
+      // Split SQL statements and execute them
+      const statements = migrationSQL
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+
+      for (const statement of statements) {
+        try {
+          this.db.exec(statement);
+        } catch (error) {
+          // Ignore errors for INSERT statements (version might already exist)
+          if (!statement.toUpperCase().includes('INSERT INTO schema_version')) {
+            throw error;
+          }
+        }
+      }
+    } catch (error) {
+      // If migration file doesn't exist, create tables inline
+      this.createTablesInline();
+    }
+  }
+
+  /**
+   * Create tables inline if migration file is not found
+   */
+  private createTablesInline(): void {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        metadata TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS memory_history (
+        id TEXT PRIMARY KEY,
+        memory_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        prev_value TEXT,
+        new_value TEXT,
+        event TEXT NOT NULL CHECK (event IN ('ADD', 'UPDATE', 'DELETE')),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP,
+        metadata TEXT,
+        is_deleted INTEGER DEFAULT 0
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_memory_history_memory_id
+        ON memory_history(memory_id);
+
+      CREATE INDEX IF NOT EXISTS idx_memory_history_user_id
+        ON memory_history(user_id);
+
+      CREATE INDEX IF NOT EXISTS idx_memory_history_created_at
+        ON memory_history(created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS chat_sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP,
+        message_count INTEGER DEFAULT 0,
+        metadata TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id
+        ON chat_sessions(user_id);
+
+      CREATE TABLE IF NOT EXISTS schema_version (
+        version INTEGER PRIMARY KEY,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        description TEXT
+      );
+    `);
+
+    // Try to insert version record (may fail if already exists)
+    try {
+      this.db.exec(`
+        INSERT INTO schema_version (version, description)
+        VALUES (1, 'Initial schema: memory_history, users, chat_sessions');
+      `);
+    } catch (error) {
+      // Version already exists, ignore error
+    }
   }
 
   /**
