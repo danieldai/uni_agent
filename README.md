@@ -137,17 +137,18 @@ npm run electron:dev
 
 #### Mobile Apps
 ```bash
-# Build for mobile
-npm run build:mobile
+# iOS Development (build + open Xcode)
+npm run ios:dev
 
-# Sync with Capacitor
-npm run cap:sync
+# Android Development (build + open Android Studio)
+npm run android:dev
 
-# Open in Xcode (iOS)
-npm run cap:ios
-
-# Open in Android Studio (Android)
-npm run cap:android
+# Or build and sync manually:
+npm run build:ios        # Build for iOS
+npm run build:android    # Build for Android
+npm run cap:sync         # Sync with Capacitor
+npm run cap:ios          # Open in Xcode
+npm run cap:android      # Open in Android Studio
 ```
 
 ## 📁 Project Structure
@@ -419,18 +420,20 @@ If you encounter issues not listed here:
 ```bash
 # Development
 npm run dev                    # Run Next.js dev server
-npm run electron:dev           # Build and run Electron app
-npm run mobile:dev             # Build for mobile and open in IDE
+npm run electron:dev           # Build and open Electron app
+npm run ios:dev                # Build and open iOS in Xcode
+npm run android:dev            # Build and open Android in Android Studio
 
 # Building
 npm run build                  # Build for web (with API routes)
 npm run build:web              # Build standalone web server
-npm run build:mobile           # Build static export for mobile
+npm run build:ios              # Build static export for iOS
+npm run build:android          # Build static export for Android
 npm run build:electron         # Build static export for Electron
 
-# Electron Desktop
-npm run electron:build         # Build Electron app
-npm run electron:package       # Package Electron app for distribution
+# Electron Desktop - Platform-Specific Builds
+npm run build:electron:macos   # Build and package Electron app for macOS
+npm run build:electron:windows # Build and package Electron app for Windows
 npm run cap:electron           # Open Electron project
 
 # Mobile (Capacitor)
