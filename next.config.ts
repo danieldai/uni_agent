@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   ...(isMobileBuild || isElectronBuild ? { output: 'export' } : {}),
   ...(isWebBuild ? { output: 'standalone' } : {}),
 
+  // Fix asset loading in Electron by using relative paths
+  ...(isElectronBuild ? { assetPrefix: './' } : {}),
+
   trailingSlash: false,       // Prevent trailing slash redirects on API routes
   images: {
     unoptimized: isMobileBuild || isElectronBuild, // Only unoptimized for mobile and electron builds

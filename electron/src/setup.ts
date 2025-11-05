@@ -19,8 +19,12 @@ const reloadWatcher = {
   watcher: null,
 };
 export function setupReloadWatcher(electronCapacitorApp: ElectronCapacitorApp): void {
+  // In dev mode, watch the root 'out' directory (one level up from electron folder)
+  const outDirectory = electronIsDev
+    ? join(app.getAppPath(), '..', 'out')
+    : join(app.getAppPath(), 'out');
   reloadWatcher.watcher = chokidar
-    .watch(join(app.getAppPath(), 'out'), {
+    .watch(outDirectory, {
       ignored: /[/\\]\./,
       persistent: true,
     })
@@ -77,8 +81,13 @@ export class ElectronCapacitorApp {
     }
 
     // Setup our web app loader, this lets us load apps like react, vue, and angular without changing their build chains.
+    // In dev mode, app.getAppPath() points to electron folder, so we need to go up one level to find the root 'out' directory
+    // In production, it points to the app package, and we look for out relative to that
+    const outDirectory = electronIsDev
+      ? join(app.getAppPath(), '..', 'out')
+      : join(app.getAppPath(), 'out');
     this.loadWebApp = electronServe({
-      directory: join(app.getAppPath(), 'out'),
+      directory: outDirectory,
       scheme: this.customScheme,
     });
   }
